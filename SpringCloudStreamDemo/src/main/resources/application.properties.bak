@@ -1,0 +1,86 @@
+server.port=8080
+#这几个是默认配置。 不配也行。
+#spring.rabbitmq.host=localhost
+#spring.rabbitmq.port=5672
+#spring.rabbitmq.username=guest
+#spring.rabbitmq.password=guest
+
+#配置binder 一个Binder对应一个消息中间件源
+#当只有一个binder源时，会默认读取spring.rabbitmq.***属性。
+#spring.cloud.stream.binders.<bindername>.<prop>=value
+
+#=== 配置多个binder
+#spring.cloud.stream.binders.demobinder.type=rabbit
+#spring.cloud.stream.binders.demobinder.environment.spring.rabbitmq.addresses=worker1:5672,worker2:5672,worker3:5672
+##spring.cloud.stream.binders.demobinder.environment.spring.rabbitmq.host=localhost
+#spring.cloud.stream.binders.demobinder.environment.spring.rabbitmq.port=5672
+#spring.cloud.stream.binders.demobinder.environment.spring.rabbitmq.username=admin
+#spring.cloud.stream.binders.demobinder.environment.spring.rabbitmq.password=admin
+#spring.cloud.stream.binders.demobinder.environment.spring.rabbitmq.virtual-host=/mirror
+#默认的binder
+#spring.cloud.stream.bindings.input.binder=demobinder
+
+#=====================配置binding 一个binding对应一个队列
+# 这个output就对应Source类里的字符串OUTPUT stream中默认的发送队列
+#指定output这个binding的exchange 默认会创建一个topic类型的exchange。然后绑定的routingKey为#
+spring.cloud.stream.bindings.output.destination=scstreamExchange
+#指定队列名。如果没有指定会生成一个很长的默认名字的队列。
+spring.cloud.stream.bindings.output.group=myoutput
+
+#指定参与消息分区的消费端节点数量
+spring.cloud.stream.bindings.output.producer.partition-count=2
+#只有消费端分区ID为1的消费端能接收到消息
+spring.cloud.stream.bindings.output.producer.partition-key-expression=1
+#新版本中这个属性已经取消，改为通过分区表达式自动判断
+#spring.cloud.stream.bindings.output.producer.partitioned=true
+
+#这个input就对应Sink.INPUT strem中默认的消费队列
+spring.cloud.stream.bindings.input.destination=scstreamExchange
+spring.cloud.stream.bindings.input.group=myinput
+#启动消费分区 新版本这个属性已经取消，改为由分区表达式自动判断
+spring.cloud.stream.bindings.input.consumer.partitioned=true
+#参与分区的消费端节点个数
+spring.cloud.stream.bindings.input.consumer.instance-count=2
+#设置该实例的消费端分区ID
+spring.cloud.stream.bindings.input.consumer.instance-index=1
+spring.cloud.stream.bindings.input.consumer.concurrency=5
+spring.cloud.stream.bindings.input.consumer.maxAttempts=1
+
+#=====================配置consumer 配置binding的consumer属性
+#spring.cloud.stream.rabbit.bindings.<bindingName>.consumer.<prop>=value
+
+#=====================配置rabbit对应的binding的producer属性
+#spring.cloud.stream.rabbit.bindings.<bindingName>.producer.<prop>=value
+
+#用死信队列实现延迟队列
+#spring.cloud.stream.rabbit.bindings.output.producer.autoBindDlq=true
+#spring.cloud.stream.rabbit.bindings.output.producer.ttl=3000
+#spring.cloud.stream.rabbit.bindings.output.producer.deadLetterExchange=DlqExchange
+#spring.cloud.stream.rabbit.bindings.output.producer.deadLetterQueueName=DlqExchange.dlQueue
+#消息经过3秒后，会自动转入到死信队列DlqExchange.dlQueue，然后可以定义消费者来进行消费。
+#spring.cloud.stream.bindings.input.destination=DlqExchange
+#spring.cloud.stream.bindings.input.group=dlQueue
+
+
+#================使用现有的交换机和队列
+#spring.cloud.stream.bindings.output.destination=fanoutExchange
+#spring.cloud.stream.rabbit.bindings.output.producer.bind-queue=false
+
+#spring.cloud.stream.bindings.input.destination=fanoutExchange
+#spring.cloud.stream.bindings.input.group=fanout.q1
+#spring.cloud.stream.rabbit.bindings.input.consumer.bind-queue=false
+#spring.cloud.stream.rabbit.bindings.input.consumer.queue-name-group-only=true
+#spring.cloud.stream.bindings.input.content-type=text/plain
+
+#============= 添加routingkey  使用现有的交换机directExchange
+#spring.cloud.stream.bindings.output.destination=directExchange
+#spring.cloud.stream.rabbit.bindings.output.producer.declare-exchange=false
+## SCS发送消息时，是没有routingkey概念的，所以routingkey只能放到header中。
+#spring.cloud.stream.rabbit.bindings.output.producer.routing-key-expression=headers.routingkey
+#
+#spring.cloud.stream.bindings.input.destination=directExchange
+#spring.cloud.stream.rabbit.bindings.input.consumer.declare-exchange=false
+#spring.cloud.stream.bindings.input.group=direct_queue
+#spring.cloud.stream.rabbit.bindings.input.consumer.bind-queue=false
+#spring.cloud.stream.rabbit.bindings.input.consumer.queue-name-group-only=true
+#spring.cloud.stream.bindings.input.content-type=text/plain

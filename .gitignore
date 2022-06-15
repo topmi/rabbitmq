@@ -1,0 +1,20 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/*
+*/.idea/misc.xml
+*/.idea/workspace.xml
+*/.idea/compiler.xml
+*/.idea/encodings.xml
+*/.idea/misc.xml
+*/.idea/workspace.xml
+*/.idea/
+*.log
+*.gz
+*.pid
+*.jar
+*.csv
+*/target/*
+*/*.iml
+target/*
+jvm-log/*
+jvm-dump/*
+.DS_Store
